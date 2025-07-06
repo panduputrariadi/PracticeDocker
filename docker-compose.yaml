@@ -1,0 +1,49 @@
+# version: '3.8'
+
+services:
+  app:
+    image: dunglas/frankenphp
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      # dockerfile: docker/worker.dockerfile
+    container_name: laravel_frankenphp
+    develop:
+      watch:
+        - action: sync
+          path: ./
+          target: /app
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: package.json
+
+    volumes:
+      - .:/app
+    ports:
+      - "8000:80"
+      # - "8001:8000"
+    labels:
+      frankenphp.document-root: "/app/public"
+      frankenphp.bootstrap: "/app/public/index.php"
+    environment:
+      APP_ENV: local
+      APP_DEBUG: true
+      APP_URL: http://localhost
+    depends_on:
+      - db
+
+  db:
+    image: postgres
+    container_name: postgres_db
+    environment:
+      POSTGRES_DB: dockerapp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Panduputra210502
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
