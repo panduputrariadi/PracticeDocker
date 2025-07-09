@@ -26,7 +26,7 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (!$token = JWTAuth::attempt($credentials)) {
-        // atau: if (!$token = auth('api')->attempt($credentials)) {
+            // atau: if (!$token = auth('api')->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
         $user = auth()->user();
@@ -35,11 +35,14 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             // 'refresh_token' => auth()->refresh(),
+            // 'refresh_token' => JWTAuth::refresh($token),
+            // 'refresh_token' => JWTAuth::refresh($token),
             'token_type' => 'bearer',
             'expires_in' => auth('api')->factory()->getTTL() * 60,
             'user' => $user
         ]);
     }
+
 
     public function register(Request $request)
     {
@@ -80,33 +83,16 @@ class AuthController extends Controller
         return response()->json(['message' => 'User successfully signed out', 'user' => auth()->user()]);
     }
 
-    // public function refresh()
-    // {
-    //     return $this->createNewToken(auth()->refresh());
-    // }
     public function refresh()
     {
         try {
             $newToken = auth('api')->refresh();
-
-            return response()->json([
-                'access_token' => $newToken,
-                'token_type' => 'bearer',
-                'expires_in' => auth('api')->factory()->getTTL() * 60,
-                'user' => auth('api')->user()
-            ]);
+            return $this->createNewToken($newToken);
         } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
-            return response()->json(['error' => 'Token is invalid'], 401);
-        } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
-            return response()->json(['error' => 'Token has expired'], 401);
+            return response()->json(['error' => 'Invalid Token'], 401);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Could not refresh token'], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-    }
-
-    public function userProfile()
-    {
-        return response()->json(auth()->user());
     }
 
     protected function createNewToken($token)
@@ -114,7 +100,13 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'user' => auth()->user()
+            'expires_in' => auth('api')->factory()->getTTL() * 60,
+            'user' => auth('api')->user(),
         ]);
+    }
+
+    public function userProfile()
+    {
+        return response()->json(auth()->user());
     }
 }

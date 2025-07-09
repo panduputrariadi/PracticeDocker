@@ -4,17 +4,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\RentalController;
 
 Route::prefix('auth')->name('auth.')->group(function () {
     // Public routes
     Route::post('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/register', [AuthController::class, 'register'])->name('register');
+    Route::post('/refresh', [AuthController::class, 'refresh'])->name('refresh');
 
     // Protected routes
     Route::middleware('auth:api')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-        Route::post('/refresh', [AuthController::class, 'refresh'])->name('refresh');
+        // Route::post('/refresh', [AuthController::class, 'refresh'])->name('refresh');
         Route::get('/user-profile', [AuthController::class, 'userProfile'])->name('profile');
 
         Route::post('create-car', [CarController::class, 'createCar'])->name('car.create');
@@ -28,5 +30,8 @@ Route::prefix('auth')->name('auth.')->group(function () {
 
         Route::get('get-all-rentals', [RentalController::class, 'getAllRentals'])->name('rental.all');
         Route::post('create-rental', [RentalController::class, 'createRental'])->name('rental.create');
+
+        Route::get('get-all-categories', [CategoryController::class, 'allCategories'])->name('category.all');
+        Route::post('create-category', [CategoryController::class, 'createCategory'])->name('category.create');
     });
 });
