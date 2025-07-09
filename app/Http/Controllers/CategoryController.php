@@ -63,7 +63,7 @@ class CategoryController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'name' => 'required|string|max:255',
+                'name' => 'nullable|string|max:255',
                 'description' => 'required|string',
             ]);
 
@@ -74,7 +74,7 @@ class CategoryController extends Controller
                     'errors' => $validator->errors()
                 ], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
-            $slug = Str::slug($request->slug);
+            $slug = Str::slug($request->name);
             $originalSlug = $slug;
             $counter = 1;
             while (Category::where('slug', $slug)->exists()) {
@@ -96,6 +96,33 @@ class CategoryController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create category',
+                'error' => env('APP_DEBUG') ? $e->getMessage() : 'Internal server error'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function softDeleteCategory($id)
+    {
+        try {
+            $category = Category::find($id);
+
+            if (!$category) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Category not found',
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            $category->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Category soft deleted successfully',
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to soft delete category',
                 'error' => env('APP_DEBUG') ? $e->getMessage() : 'Internal server error'
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
