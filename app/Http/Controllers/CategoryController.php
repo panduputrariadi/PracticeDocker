@@ -224,4 +224,65 @@ class CategoryController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function restoreCategory($id)
+    {
+        try {
+            $category = Category::withTrashed()->find($id);
+
+            if (!$category) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Category not found',
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            if (!$category->trashed()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Category is not deleted',
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            $category->restore();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Category restored successfully',
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to restore category',
+                'error' => env('APP_DEBUG') ? $e->getMessage() : 'Internal server error'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function forceDeleteCategory($id)
+    {
+        try {
+            $category = Category::withTrashed()->find($id);
+
+            if (!$category) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Category not found',
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            $category->forceDelete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Category permanently deleted',
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to permanently delete category',
+                'error' => env('APP_DEBUG') ? $e->getMessage() : 'Internal server error'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }
