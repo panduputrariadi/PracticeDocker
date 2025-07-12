@@ -126,30 +126,47 @@ class CarController extends Controller
                     ->paginate($perPage, ['*'], 'page', $page);
 
             // Format response
-            if($cars->count() > 0) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Cars retrieved successfully',
-                    'data' => [
-                        'items' => $cars->items(),
-                        'meta' => [
-                            'current_page' => $cars->currentPage(),
-                            'per_page' => $cars->perPage(),
-                            'total_items' => $cars->total(),
-                            'total_pages' => $cars->lastPage(),
-                            'has_more_pages' => $cars->hasMorePages(),
-                            'next_page_url' => $cars->nextPageUrl(),
-                            'previous_page_url' => $cars->previousPageUrl()
-                        ]
+            // if($cars->count() > 0) {
+            //     return response()->json([
+            //         'success' => true,
+            //         'message' => 'Cars retrieved successfully',
+            //         'data' => [
+            //             'items' => $cars->items(),
+            //             'meta' => [
+            //                 'current_page' => $cars->currentPage(),
+            //                 'per_page' => $cars->perPage(),
+            //                 'total_items' => $cars->total(),
+            //                 'total_pages' => $cars->lastPage(),
+            //                 'has_more_pages' => $cars->hasMorePages(),
+            //                 'next_page_url' => $cars->nextPageUrl(),
+            //                 'previous_page_url' => $cars->previousPageUrl()
+            //             ]
+            //         ]
+            //     ], Response::HTTP_OK);
+            // } else {
+            //     return response()->json([
+            //         'success' => false,
+            //         'message' => 'No cars found',
+            //         'data' => []
+            //     ], Response::HTTP_NOT_FOUND);
+            // }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cars retrieved successfully',
+                'data' => [
+                    'items' => $cars->items(),
+                    'meta' => [
+                        'current_page' => $cars->currentPage(),
+                        'per_page' => $cars->perPage(),
+                        'total_items' => $cars->total(),
+                        'total_pages' => $cars->lastPage(),
+                        'has_more_pages' => $cars->hasMorePages(),
+                        'next_page_url' => $cars->nextPageUrl(),
+                        'previous_page_url' => $cars->previousPageUrl()
                     ]
-                ], Response::HTTP_OK);
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No cars found',
-                    'data' => []
-                ], Response::HTTP_NOT_FOUND);
-            }
+                ]
+            ], Response::HTTP_OK);
 
         } catch (\Exception $e) {
             return response()->json([

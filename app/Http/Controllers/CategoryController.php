@@ -101,6 +101,55 @@ class CategoryController extends Controller
         }
     }
 
+    public function updateCategory(Request $request, $id)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'nullable|string|max:255',
+                'description' => 'required|string',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation errors',
+                    'errors' => $validator->errors()
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+
+            $category = Category::find($id);
+
+            if (!$category) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Category not found',
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            $category->update([
+                'name' => $request->name,
+                'description' => $request->description,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Category updated successfully',
+                'data' => $category
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update category',
+                'error' => env('APP_DEBUG') ? $e->getMessage() : 'Internal server error'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to update category',
+            'error' => env('APP_DEBUG') ? $e->getMessage() : 'Internal server error'
+        ])->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+
     public function softDeleteCategory($id)
     {
         try {
@@ -123,6 +172,54 @@ class CategoryController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to soft delete category',
+                'error' => env('APP_DEBUG') ? $e->getMessage() : 'Internal server error'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function getSoftDeletedCategories(Request $request)
+    {
+        try {
+            // Konfigurasi pagination
+            $validator = Validator::make($request->all(), [
+                'per_page' => 'sometimes|integer|min:1|max:100',
+                'page' => 'sometimes|integer|min:1'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation errors',
+                    'errors' => $validator->errors()
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+
+            $perPage = $request->input('per_page', 10); // Default 10 item per halaman
+            $page = $request->input('page', 1); // Default halaman 1
+
+            // Query dengan pagination
+            $categories = Category::onlyTrashed()->paginate($perPage, ['*'], 'page', $page);
+
+            // Format response
+            return response()->json([
+                'success' => true,
+                'message' => 'Soft deleted categories retrieved successfully',
+                'data' => [
+                    'items' => $categories->items(),
+                    'meta' => [
+                        'current_page' => $categories->currentPage(),
+                        'total' => $categories->total(),
+                        'per_page' => $categories->perPage(),
+                        'last_page' => $categories->lastPage(),
+                        'from' => $categories->firstItem(),
+                        'to' => $categories->lastItem(),
+                    ],
+                ]
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve soft deleted categories',
                 'error' => env('APP_DEBUG') ? $e->getMessage() : 'Internal server error'
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
