@@ -33,6 +33,7 @@ Route::prefix('auth')->name('auth.')->group(function () {
 
         Route::get('get-all-categories', [CategoryController::class, 'allCategories'])->name('category.all');
         Route::post('create-category', [CategoryController::class, 'createCategory'])->name('category.create');
+        Route::put('edit-category/{id}', [CategoryController::class, 'updateCategory'])->name('category.edit');
         Route::get('soft-delete-category/{id}', [CategoryController::class, 'softDeleteCategory'])->name('category.softDelete');
         Route::get('get-soft-deleted-categories', [CategoryController::class, 'getSoftDeletedCategories'])->name('category.softDeleted');
         Route::get('restore-category/{id}', [CategoryController::class, 'restoreCategory'])->name('category.restore');
