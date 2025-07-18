@@ -285,4 +285,27 @@ class CategoryController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function dropDownCategory()
+    {
+        try {
+            $query = Category::select('id', 'name');
+            if (request()->has('search')) {
+                $query->where('name', 'like', '%' . request()->input('search') . '%');
+            }
+            $categories = $query->get()->toArray();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Categories retrieved successfully',
+                'data' => $categories
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve categories',
+                'error' => env('APP_DEBUG') ? $e->getMessage() : 'Internal server error'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

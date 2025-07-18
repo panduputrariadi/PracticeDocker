@@ -6,6 +6,7 @@ use App\Http\Controllers\CarController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\RentalController;
+use App\Http\Controllers\VehicleController;
 
 Route::prefix('auth')->name('auth.')->group(function () {
     // Public routes
@@ -38,5 +39,9 @@ Route::prefix('auth')->name('auth.')->group(function () {
         Route::get('get-soft-deleted-categories', [CategoryController::class, 'getSoftDeletedCategories'])->name('category.softDeleted');
         Route::get('restore-category/{id}', [CategoryController::class, 'restoreCategory'])->name('category.restore');
         Route::get('force-delete-category/{id}', [CategoryController::class, 'forceDeleteCategory'])->name('category.forceDelete');
+        Route::get('dropdown-category', [CategoryController::class, 'dropDownCategory'])->name('category.dropdown');
+
+        Route::get('get-all-vehicles', [VehicleController::class, 'getAllVehicles'])->name('vehicle.all');
+        Route::post('create-vehicle', [VehicleController::class, 'createVehicle'])->name('vehicle.create');
     });
 });
