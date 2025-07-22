@@ -286,12 +286,13 @@ class CategoryController extends Controller
         }
     }
 
-    public function dropDownCategory()
+    public function dropDownCategory(Request $request)
     {
         try {
-            $query = Category::select('id', 'name');
-            if (request()->has('search')) {
-                $query->where('name', 'like', '%' . request()->input('search') . '%');
+            $query = Category::select('id', 'name')->limit(5);
+            if ($request->has('search')) {
+                $search = $request->input('search');
+                $query->where('name', 'ilike', '%' . $search . '%');
             }
             $categories = $query->get()->toArray();
 

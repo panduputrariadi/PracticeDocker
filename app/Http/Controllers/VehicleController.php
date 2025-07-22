@@ -36,9 +36,7 @@ class VehicleController extends Controller
 
             // Query dengan pagination
             $vehicles = Vehicle::withoutTrashed()
-                ->with(['category', 'images' => function ($query) {
-                    $query->select('vehicleId', 'imagePath');
-                }])
+                ->with(['category'])
                 ->paginate($perPage, ['*'], 'page', $page);
 
             // Format response
@@ -81,8 +79,8 @@ class VehicleController extends Controller
                 'rate_per_day' => 'required|numeric|min:0',
                 'rate_per_hour' => 'required|numeric|min:0',
                 'capacity' => 'required|integer|min:0',
-                'images' => 'required|array|min:1',
-                'images.*' => 'required|string',
+                'images' => 'nullable|array|min:1',
+                'images.*' => 'nullable|string',
                 'mileage' => 'required|numeric|min:0',
                 'model' => 'required|string|max:255',
                 'brand' => 'required|string|max:255',
