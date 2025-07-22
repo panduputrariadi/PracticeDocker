@@ -43,5 +43,6 @@ Route::prefix('auth')->name('auth.')->group(function () {
 
         Route::get('get-all-vehicles', [VehicleController::class, 'getAllVehicles'])->name('vehicle.all');
         Route::post('create-vehicle', [VehicleController::class, 'createVehicle'])->name('vehicle.create');
+        Route::get('delete-vehicle/{id}', [VehicleController::class, 'softDeleteVehicle'])->name('vehicle.softDelete');
     });
 });

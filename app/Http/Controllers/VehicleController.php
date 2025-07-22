@@ -164,4 +164,35 @@ class VehicleController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function softDeleteVehicle($id)
+    {
+        try {
+            DB::beginTransaction();
+            $vehicle = Vehicle::find($id);
+
+            if (!$vehicle) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vehicle not found',
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            DB::commit();
+
+            $vehicle->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Vehicle soft deleted successfully',
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to soft delete vehicle',
+                'error' => env('APP_DEBUG') ? $e->getMessage() : 'Internal server error'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }
