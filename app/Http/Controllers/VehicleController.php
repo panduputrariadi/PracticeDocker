@@ -103,6 +103,27 @@ class VehicleController extends Controller
                 $slug = $originalSlug . '-' . $counter++;
             }
 
+
+            $vehicle = Vehicle::create([
+                'slug' => $slug,
+                'name' => $request->name,
+                'description' => $request->description,
+                'category_id' => $request->category_id,
+                'status' => $request->status,
+                'transmission' => Vehicle::TRANSMISSION_MANUAL,
+                'plate_number' => $request->plate_number,
+                'fuel_type' => $request->fuel_type,
+                'color' => $request->color,
+                'rate_per_day' => $request->rate_per_day,
+                'rate_per_hour' => $request->rate_per_hour,
+                'capacity' => $request->capacity,
+                'mileage' => $request->mileage,
+                'model' => $request->model,
+                'brand' => $request->brand,
+                'type' => $request->type,
+                'year' => $request->year
+            ]);
+
             // handle upload image
             if($request->hasFile('images')) {
                 $path_image = storage_path('app/public/vehicles/'.$vehicle->slug);
@@ -129,28 +150,8 @@ class VehicleController extends Controller
                 }
             }
 
-            $vehicle = Vehicle::create([
-                'slug' => $slug,
-                'name' => $request->name,
-                'description' => $request->description,
-                'category_id' => $request->category_id,
-                'status' => $request->status,
-                'transmission' => Vehicle::TRANSMISSION_MANUAL,
-                'plate_number' => $request->plate_number,
-                'fuel_type' => $request->fuel_type,
-                'color' => $request->color,
-                'rate_per_day' => $request->rate_per_day,
-                'rate_per_hour' => $request->rate_per_hour,
-                'capacity' => $request->capacity,
-                'mileage' => $request->mileage,
-                'model' => $request->model,
-                'brand' => $request->brand,
-                'type' => $request->type,
-                'year' => $request->year
-            ]);
-
             DB::commit();
-            $vehicle->load('images');
+            // $vehicle->load('images');
 
             return response()->json([
                 'success' => true,
