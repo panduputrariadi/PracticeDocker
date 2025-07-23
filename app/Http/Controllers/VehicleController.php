@@ -79,8 +79,8 @@ class VehicleController extends Controller
                 'rate_per_day' => 'required|numeric|min:0',
                 'rate_per_hour' => 'required|numeric|min:0',
                 'capacity' => 'required|integer|min:0',
-                'images' => 'nullable|array|min:1',
-                'images.*' => 'nullable|string',
+                'images' => 'required|array|min:1',
+                'images.*' => 'file|mimes:jpg,jpeg,png,gif|max:2048', 
                 'mileage' => 'required|numeric|min:0',
                 'model' => 'required|string|max:255',
                 'brand' => 'required|string|max:255',
@@ -148,6 +148,7 @@ class VehicleController extends Controller
                         ], Response::HTTP_INTERNAL_SERVER_ERROR);
                     }
                 }
+                // dd($request->file('images'));
             }
 
             DB::commit();
