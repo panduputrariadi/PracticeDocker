@@ -80,7 +80,7 @@ class VehicleController extends Controller
                 'rate_per_hour' => 'required|numeric|min:0',
                 'capacity' => 'required|integer|min:0',
                 'images' => 'required|array|min:1',
-                'images.*' => 'file|mimes:jpg,jpeg,png,gif|max:2048', 
+                'images.*' => 'file|mimes:jpg,jpeg,png,gif|max:2048',
                 'mileage' => 'required|numeric|min:0',
                 'model' => 'required|string|max:255',
                 'brand' => 'required|string|max:255',
@@ -194,6 +194,82 @@ class VehicleController extends Controller
                 'success' => false,
                 'message' => 'Failed to soft delete vehicle',
                 'error' => env('APP_DEBUG') ? $e->getMessage() : 'Internal server error'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function updateData(Request $request, $id) {
+        try{
+            DB::begisTransaction();
+
+            $valdiator = Validator::make($request->all(), [
+                'name' => 'nullable|string|max:255',
+                'description' => 'nullable|string',
+                'category_id' => 'nullable|exists:categories,id',
+                'status' => 'nullable|string|max:50',
+                'transmission' => 'nullable|string|max:50',
+                'plate_number' => 'nullable|string|max:20|unique:vehicles',
+                'fuel_type' => 'nullable|string|max:50',
+                'color' => 'nullable|string|max:50',
+                'rate_per_day' => 'nullable|numeric|min:0',
+                'rate_per_hour' => 'nullable|numeric|min:0',
+                'capacity' => 'nullable|integer|min:0',
+                'images' => 'nullable|array|min:1',
+                'images.*' => 'file|mimes:jpg,jpeg,png,gif|max:2048',
+                'mileage' => 'nullable|numeric|min:0',
+                'model' => 'nullable|string|max:255',
+                'brand' => 'nullable|string|max:255',
+                'type' => 'nullable|string|max:50',
+                'year' => 'nullable|integer|min:0',
+            ]);
+
+            if($valdiator->fails()){
+                return response()->json([
+                    'success' => false,
+                    'message' => $valdiator->errors(),
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            $vehicle = Vehicle::find($id);
+            if(!$vehicle){
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data tidak ditemukan',
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            DB::commit();
+
+            $vehicle->update([
+                'name' => $request->name,
+                'description' => $request->description,
+                'category_id' =>  $request->category_id,
+                'status' => $request->status,
+                'transmission' => $request->transmission,
+                'plate_number' => $request->plate_number,
+                'fuel_type' => $request->fuel_type,
+                'color' => $request->color,
+                'rate_per_day' => $request->rate_per_day,
+                'rate_per_hour' => $request->rate_per_hour,
+                'capacity' => $request->capacity,
+                'mileage' => $request->mileage,
+                'model' => $request->model,
+                'brand' => $request->brand,
+                'type' => $request->type,
+                'year' => $request->year
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil diupdate',
+                'data' => $vehicle
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

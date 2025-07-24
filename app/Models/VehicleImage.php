@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class VehicleImage extends Model
 {
     use HasUuids, HasFactory;
-    protected $table = 'vehicle_images';
+    protected $table = 'vehicles_images';
 
     protected $fillable = [
         'vehicle_id',
