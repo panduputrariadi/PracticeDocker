@@ -273,4 +273,104 @@ class VehicleController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function getSoftDeleteVehicles(Request $request) {
+       try {
+            $validation = Validator::make($request->all(), [
+                'per_page' => 'sometimes|integer|min:1|max:100',
+                'page' => 'sometimes|integer|min:1'
+            ]);
+
+            if ($validation->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation errors',
+                    'errors' => $validation->errors()
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+
+            // Konfigurasi pagination
+            $perPage = $request->input('per_page', 10); // Default 10 item per halaman
+            $page = $request->input('page', 1); // Default halaman 1
+
+            // Query dengan pagination
+            $vehicles = Vehicle::onlyTrashed()
+                ->with(['category'])
+                ->paginate($perPage, ['*'], 'page', $page);
+
+            // Format response
+            return response()->json([
+                'success' => true,
+                'message' => 'Vehicles retrieved successfully',
+                'data' => [
+                    'items' => $vehicles->items(),
+                    'meta' => [
+                        'current_page' => $vehicles->currentPage(),
+                        'total' => $vehicles->total(),
+                        'per_page' => $vehicles->perPage(),
+                        'last_page' => $vehicles->lastPage(),
+                        'from' => $vehicles->firstItem(),
+                        'to' => $vehicles->lastItem(),
+                    ]
+                ]
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function restoreVehicle($id) {
+        try {
+            DB::beginTransaction();
+            $vehicle = Vehicle::withTrashed()->find($id);
+            if(!$vehicle){
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data tidak ditemukan',
+                ], Response::HTTP_NOT_FOUND);
+            }
+            $vehicle->restore();
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil di restore',
+                'data' => $vehicle
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function forceDeleteVehicle($id) {
+        try {
+            DB::beginTransaction();
+            $vehicle = Vehicle::withTrashed()->find($id);
+            if(!$vehicle){
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data tidak ditemukan',
+                ], Response::HTTP_NOT_FOUND);
+            }
+            $vehicle->forceDelete();
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil dihapus permanen',
+                'data' => $vehicle
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }
