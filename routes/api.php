@@ -36,12 +36,8 @@ Route::prefix('auth')->name('auth.')->group(function () {
         Route::post('categories', [CategoryController::class, 'store']);
         Route::put('categories/{id}', [CategoryController::class, 'update']);
 
-        Route::get('get-all-vehicles', [VehicleController::class, 'getAllVehicles'])->name('vehicle.all');
-        Route::post('create-vehicle', [VehicleController::class, 'createVehicle'])->name('vehicle.create');
-        Route::get('delete-vehicle/{id}', [VehicleController::class, 'softDeleteVehicle'])->name('vehicle.softDelete');
-        Route::put('update-data/{id}', [VehicleController::class, 'updateData'])->name('vehicle.update');
-        Route::get('get-soft-delete-vehicles', [VehicleController::class, 'getSoftDeleteVehicles'])->name('vehicle.softDeleted');
-        Route::get('restore-vehicle/{id}', [VehicleController::class, 'restoreVehicle'])->name('vehicle.restore');
-        Route::get('force-delete-vehicle/{id}', [VehicleController::class, 'forceDeleteVehicle'])->name('vehicle.forceDelete');
+        Route::get('vehicles', [VehicleController::class, 'index']);
+        // Route::post('vehicles', [VehicleController::class, 'store']);
+        // Route::put('vehicles/{id}', [VehicleController::class, 'update']);
     });
 });
