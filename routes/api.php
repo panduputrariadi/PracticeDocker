@@ -37,6 +37,8 @@ Route::prefix('auth')->name('auth.')->group(function () {
         Route::put('categories/{id}', [CategoryController::class, 'update']);
 
         Route::get('vehicles', [VehicleController::class, 'index']);
+        Route::post('vehicles', [VehicleController::class, 'store']);
+        Route::put('vehicles/{id}', [VehicleController::class, 'update']);
         // Route::post('vehicles', [VehicleController::class, 'store']);
         // Route::put('vehicles/{id}', [VehicleController::class, 'update']);
     });
