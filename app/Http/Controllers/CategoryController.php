@@ -23,6 +23,9 @@ class CategoryController extends Controller
             case 'all':
                 return $this->categoryService->allCategories($request);
                 break;
+            case 'fetch':
+                return $this->categoryService->fetchCategories($request);
+                break;
             case 'get-soft-deleted':
                 return $this->categoryService->getSoftDeletedCategories($request);
                 break;

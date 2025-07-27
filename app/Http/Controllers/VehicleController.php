@@ -30,6 +30,12 @@ class VehicleController extends Controller
             case 'force-delete':
                 return $this->vehicleService->forceDeleteVehicle($request->id);
                 break;
+            case 'fetch-brand':
+                return $this->vehicleService->fetchVehicleByBrand();
+                break;
+            case 'fetch-model':
+                return $this->vehicleService->fetchVehicleByModel();
+                break;
             default:
                 return response()->json([
                     'success' => false,

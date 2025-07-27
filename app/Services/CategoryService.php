@@ -58,6 +58,25 @@ class CategoryService{
         }
     }
 
+    public function fetchCategories(Request $request)
+    {
+        try{
+            $categoris = Category::get('name', 'id');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Categories retrieved successfully',
+                'data' => $categoris
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve categories',
+                'error' => env('APP_DEBUG') ? $e->getMessage() : 'Internal server error'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     public function getCategory($id)
     {
         try {

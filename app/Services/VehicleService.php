@@ -125,15 +125,15 @@ class VehicleService
             ]);
 
             // handle upload image
-            if($request->hasFile('images')) {
-                $path_image = storage_path('app/public/vehicles/'.$vehicle->slug);
-                if(!File::exists($path_image)) {
+            if ($request->hasFile('images')) {
+                $path_image = storage_path('app/public/vehicles/' . $vehicle->slug);
+                if (!File::exists($path_image)) {
                     File::makeDirectory($path_image, 0777, true);
                 }
 
-                foreach($request->file('images') as $image) {
-                    try{
-                        $path = $image->store('vehicles/'.$vehicle->slug);
+                foreach ($request->file('images') as $image) {
+                    try {
+                        $path = $image->store('vehicles/' . $vehicle->slug);
                         $vehicleImageUrl = asset(Storage::url($path));
                         VehicleImage::create([
                             'vehicle_id' => $vehicle->id,
@@ -198,8 +198,9 @@ class VehicleService
         }
     }
 
-    public function updateData(Request $request, $id) {
-        try{
+    public function updateData(Request $request, $id)
+    {
+        try {
             DB::begisTransaction();
 
             $valdiator = Validator::make($request->all(), [
@@ -223,7 +224,7 @@ class VehicleService
                 'year' => 'nullable|integer|min:0',
             ]);
 
-            if($valdiator->fails()){
+            if ($valdiator->fails()) {
                 return response()->json([
                     'success' => false,
                     'message' => $valdiator->errors(),
@@ -231,7 +232,7 @@ class VehicleService
             }
 
             $vehicle = Vehicle::find($id);
-            if(!$vehicle){
+            if (!$vehicle) {
                 DB::rollBack();
                 return response()->json([
                     'success' => false,
@@ -265,7 +266,6 @@ class VehicleService
                 'message' => 'Data berhasil diupdate',
                 'data' => $vehicle
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -274,8 +274,9 @@ class VehicleService
         }
     }
 
-    public function getSoftDeleteVehicles(Request $request) {
-       try {
+    public function getSoftDeleteVehicles(Request $request)
+    {
+        try {
             $validation = Validator::make($request->all(), [
                 'per_page' => 'sometimes|integer|min:1|max:100',
                 'page' => 'sometimes|integer|min:1'
@@ -322,11 +323,12 @@ class VehicleService
         }
     }
 
-    public function restoreVehicle($id) {
+    public function restoreVehicle($id)
+    {
         try {
             DB::beginTransaction();
             $vehicle = Vehicle::withTrashed()->find($id);
-            if(!$vehicle){
+            if (!$vehicle) {
                 DB::rollBack();
                 return response()->json([
                     'success' => false,
@@ -348,11 +350,12 @@ class VehicleService
         }
     }
 
-    public function forceDeleteVehicle($id) {
+    public function forceDeleteVehicle($id)
+    {
         try {
             DB::beginTransaction();
             $vehicle = Vehicle::withTrashed()->find($id);
-            if(!$vehicle){
+            if (!$vehicle) {
                 DB::rollBack();
                 return response()->json([
                     'success' => false,
@@ -366,6 +369,43 @@ class VehicleService
                 'message' => 'Data berhasil dihapus permanen',
                 'data' => $vehicle
             ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function fetchVehicleByBrand()
+    {
+        try {
+            $vehicles = Vehicle::select('brand')
+                ->distinct()
+                ->get();
+            return response()->json([
+                'success' => true,
+                'message' => 'Vehicles retrieved successfully',
+                'data' => $vehicles
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+    public function fetchVehicleByModel()
+    {
+        try {
+            $vehicles = Vehicle::select('model')
+                ->distinct()
+                ->get();
+            return response()->json([
+                'success' => true,
+                'message' => 'Vehicles retrieved successfully',
+                'data' => $vehicles
+            ], Response::HTTP_OK);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
