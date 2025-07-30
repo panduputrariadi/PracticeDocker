@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\RentalController;
 use App\Http\Controllers\VehicleController;
@@ -41,5 +42,7 @@ Route::prefix('auth')->name('auth.')->group(function () {
         Route::put('vehicles/{id}', [VehicleController::class, 'update']);
         // Route::post('vehicles', [VehicleController::class, 'store']);
         // Route::put('vehicles/{id}', [VehicleController::class, 'update']);
+
+        Route::get('brands', [BrandController::class, 'index']);
     });
 });
