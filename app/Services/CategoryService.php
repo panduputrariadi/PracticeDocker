@@ -61,7 +61,7 @@ class CategoryService{
     public function fetchCategories(Request $request)
     {
         try{
-            $categoris = Category::get('name', 'id');
+            $categoris = Category::get(['id', 'name']);
 
             return response()->json([
                 'success' => true,
